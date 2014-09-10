@@ -1,5 +1,8 @@
-﻿using GalaSoft.MvvmLight;
+﻿using DataModels;
+using GalaSoft.MvvmLight;
+using LinqToDB;
 using MvvmLight1.Model;
+using Npgsql;
 using System;
 using System.Windows.Controls;
 
@@ -75,6 +78,15 @@ namespace MvvmLight1.ViewModel
 
                     WelcomeTitle = item.Title;
                 });
+            var testdb = new TestDBWrap();
+            using(var db = new TestDBDB()) {
+                
+                db.users.ForEachAsync((users) =>
+                {
+                    System.Windows.MessageBox.Show(users.id.ToString());
+                    System.Windows.MessageBox.Show(users.code.ToString());
+                });
+            }
         }
 
         ////public override void Cleanup()

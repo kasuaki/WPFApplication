@@ -42,13 +42,23 @@
     <Reference Include="GalaSoft.MvvmLight.WPF45">
       <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net45\GalaSoft.MvvmLight.WPF45.dll</HintPath>
     </Reference>
+    <Reference Include="linq2db">
+      <HintPath>..\packages\linq2db.1.0.5\lib\net45\linq2db.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>..\packages\Npgsql.2.2.0\lib\net45\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\packages\Npgsql.2.2.0\lib\net45\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>..\packages\MvvmLightLibs.4.2.30.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -70,7 +80,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataModels\TestDB.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Design\DesignDataService.cs" />
+    <Compile Include="Model\TestDB.cs" />
     <Compile Include="Model\DataItem.cs" />
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\IDataService.cs" />
@@ -111,6 +127,29 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="App.config" />
+    <None Include="LinqToDB.Templates\!ReadMe.LinqToDB.md" />
+    <None Include="LinqToDB.Templates\DataAnnotations.ttinclude" />
+    <None Include="LinqToDB.Templates\DataModel.ttinclude" />
+    <None Include="LinqToDB.Templates\EditableObject.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Access.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.DB2.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Firebird.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Informix.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.MySql.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Oracle.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.PostgreSQL.Tools.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.PostgreSQL.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.SqlCe.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.SQLite.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.SqlServer.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Sybase.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.Tools.ttinclude" />
+    <None Include="LinqToDB.Templates\LinqToDB.ttinclude" />
+    <None Include="LinqToDB.Templates\NotifyPropertyChanged.ttinclude" />
+    <None Include="LinqToDB.Templates\PluralizationService.ttinclude" />
+    <None Include="LinqToDB.Templates\T4Model.ttinclude" />
+    <None Include="LinqToDB.Templates\Validation.ttinclude" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -118,7 +157,18 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="LinqToDB.Templates\CopyMe.PostgreSQL.tt.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DataModels\TestDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TestDB.generated.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
