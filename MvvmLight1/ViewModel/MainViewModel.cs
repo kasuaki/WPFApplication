@@ -1,10 +1,13 @@
 ﻿using DataModels;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using LinqToDB;
+using mshtml;
 using MvvmLight1.Model;
 using Npgsql;
 using System;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace MvvmLight1.ViewModel
 {
@@ -28,6 +31,44 @@ namespace MvvmLight1.ViewModel
                 RaisePropertyChanged("mWebBrowser");
             }
         }
+
+        /*
+        public RelayCommand<NavigationEventArgs> LoadCompletedCommand {
+            get {
+                return _LoadCompletedCommand;
+            }
+            private set {
+                _LoadCompletedCommand = value;
+            }
+        }
+        private RelayCommand<NavigationEventArgs> _LoadCompletedCommand = new RelayCommand<NavigationEventArgs>((e) =>
+        {
+            WebBrowser sender = e.Navigator as WebBrowser;
+            System.Windows.MessageBox.Show("LoadCompletedCommand");
+            WebBrowser aWB = sender as WebBrowser;
+            HTMLDocument aHTMLDocument = aWB.Document as HTMLDocument;
+            System.Windows.MessageBox.Show(aHTMLDocument.body.document.documentElement.outerHTML);
+
+        });
+        */
+        public RelayCommand<WebBrowser> LoadCompletedCommand
+        {
+            get
+            {
+                return _LoadCompletedCommand;
+            }
+            private set
+            {
+                _LoadCompletedCommand = value;
+            }
+        }
+        private RelayCommand<WebBrowser> _LoadCompletedCommand = new RelayCommand<WebBrowser>((sender) => {
+            System.Windows.MessageBox.Show("LoadCompletedCommand");
+            WebBrowser aWB = sender as WebBrowser;
+            HTMLDocument aHTMLDocument = aWB.Document as HTMLDocument;
+            System.Windows.MessageBox.Show(aHTMLDocument.body.document.documentElement.outerHTML);
+        });
+
 
         private readonly IDataService _dataService;
 

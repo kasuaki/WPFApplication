@@ -3,6 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
         xmlns:ignore="http://www.ignore.com"
         mc:Ignorable="d ignore"
         Height="300"
@@ -21,8 +24,15 @@
     <Grid x:Name="LayoutRoot">
         <StackPanel>
             <WebBrowser Name="WB">
-            
-        </WebBrowser>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="LoadCompleted">
+                        <!--
+                        <cmd:EventToCommand Command="{Binding Path=LoadCompletedCommand}" PassEventArgsToCommand="True" />
+                        -->
+                        <i:InvokeCommandAction Command="{Binding Path=LoadCompletedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type WebBrowser}}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </WebBrowser>
         <TextBlock FontSize="36"
                    FontWeight="Bold"
                    Foreground="Purple"

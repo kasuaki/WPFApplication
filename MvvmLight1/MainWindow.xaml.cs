@@ -21,17 +21,6 @@ namespace MvvmLight1
             MainViewModel aMainVM = this.DataContext as MainViewModel;
             aMainVM.mWebBrowser = this.WB;
             aMainVM.mWebBrowser.Navigate(new Uri(@"http://www.google.com"));
-            aMainVM.mWebBrowser.LoadCompleted += mWebBrowser_LoadCompleted;
-        }
-
-        void mWebBrowser_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
-        {
-            System.Windows.MessageBox.Show("mWebBrowser_LoadCompleted");
-            WebBrowser aWB = sender as WebBrowser;
-            HTMLDocument aHTMLDocument = aWB.Document as HTMLDocument;
-            System.Windows.MessageBox.Show(aHTMLDocument.body.document.documentElement.outerHTML);
-
-
         }
     }
 }
