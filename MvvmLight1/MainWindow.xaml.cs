@@ -16,6 +16,8 @@ namespace MvvmLight1
         /// </summary>
         public MainWindow()
         {
+            this.DataContext = new MainViewModel(this.Dispatcher);
+
             InitializeComponent();
             Closing += (s, e) => ViewModelLocator.Cleanup();
             MainViewModel aMainVM = this.DataContext as MainViewModel;

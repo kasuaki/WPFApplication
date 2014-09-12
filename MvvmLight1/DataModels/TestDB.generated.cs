@@ -5,6 +5,7 @@
 // </auto-generated>
 //---------------------------------------------------------------------------------------------------
 using System;
+using System.Linq;
 
 using LinqToDB;
 using LinqToDB.Mapping;
@@ -18,7 +19,8 @@ namespace DataModels
 	/// </summary>
 	public partial class TestDBDB : LinqToDB.Data.DataConnection
 	{
-		public ITable<user> users { get { return this.GetTable<user>(); } }
+		public ITable<portfolio> portfolios { get { return this.GetTable<portfolio>(); } }
+		public ITable<user>      users      { get { return this.GetTable<user>(); } }
 
 		public TestDBDB()
 		{
@@ -30,10 +32,41 @@ namespace DataModels
 		}
 	}
 
+	[Table(Schema="public", Name="portfolio")]
+	public partial class portfolio
+	{
+		[PrimaryKey, Identity   ] public int       id      { get; set; } // integer
+		[Column,     NotNull    ] public string    銘柄      { get; set; } // text
+		[Column,        Nullable] public int?      銘柄コード   { get; set; } // integer
+		[Column,        Nullable] public string    銘柄リンク   { get; set; } // text
+		[Column,        Nullable] public string    現買リンク   { get; set; } // text
+		[Column,        Nullable] public string    現売リンク   { get; set; } // text
+		[Column,        Nullable] public DateTime? 買付日     { get; set; } // timestamp (6) without time zone
+		[Column,        Nullable] public int?      数量      { get; set; } // integer
+		[Column,        Nullable] public int?      参考単価    { get; set; } // integer
+		[Column,        Nullable] public int?      現在値     { get; set; } // integer
+		[Column,        Nullable] public int?      前日比     { get; set; } // integer
+		[Column,        Nullable] public int?      損益      { get; set; } // integer
+		[Column,        Nullable] public float?    損益パーセント { get; set; } // real
+		[Column,        Nullable] public int?      評価額     { get; set; } // integer
+		[Column,        Nullable] public string    備考      { get; set; } // text
+		[Column,        Nullable] public DateTime? 削除日時    { get; set; } // timestamp (6) without time zone
+		[Column,        Nullable] public DateTime? 更新日時    { get; set; } // timestamp (6) without time zone
+	}
+
 	[Table(Schema="public", Name="users")]
 	public partial class user
 	{
 		[Identity          ] public int  id   { get; set; } // integer
 		[Column,   Nullable] public int? code { get; set; } // integer
+	}
+
+	public static partial class TableExtensions
+	{
+		public static portfolio Find(this ITable<portfolio> table, int id)
+		{
+			return table.FirstOrDefault(t =>
+				t.id == id);
+		}
 	}
 }
