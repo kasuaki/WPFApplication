@@ -104,6 +104,7 @@
     <Compile Include="ViewModel\IWebBrowserVM.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MyViewModelBase.cs" />
+    <Compile Include="ViewModel\CheckShareWBVM.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\MyWebBrowserVM.cs" />
     <Page Include="MainWindow.xaml">

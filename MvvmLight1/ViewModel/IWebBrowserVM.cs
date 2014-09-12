@@ -12,15 +12,16 @@ namespace MvvmLight1.ViewModel
     {
         DispatcherTimer MyDispatcherTimer { get; }
         Uri MyUri { get; set; }
-        MyWebBrowser Grid { get; set; }
         WebBrowser WB { get; }
+        Status MyStatus { get; set; }
+
 
 
         void WebBrowserAdd(Panel aPanel);
         void WebBrowserRemove(Panel aPanel);
         void TimerStart();
         void TimerStop();
-        void WatchingStart();
+        void WatchStart();
         void PageUpdate();
     }
 }

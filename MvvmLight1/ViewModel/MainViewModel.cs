@@ -24,8 +24,8 @@ namespace MvvmLight1.ViewModel
     /// </summary>
     public class MainViewModel : MyViewModelBase
     {
-        private Grid _TmpGrid;
-        public Grid TmpGrid
+        private Panel _TmpGrid;
+        public Panel TmpGrid
         {
             get
             {
@@ -117,7 +117,8 @@ namespace MvvmLight1.ViewModel
 
             WBVMBuyCollection = new Collection<IWebBrowserVM>();
             WBVMWatchCollection = new Collection<IWebBrowserVM>();
-            WBVMWatchCollection.Add(new MyWebBrowserVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM));
+            WBVMWatchCollection.Add(new MyWebBrowserVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM, 0, 1));
+            WBVMWatchCollection.Add(new CheckShareWBVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM, 0, 2));
 
         }
 
@@ -128,7 +129,6 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         void CVM_BuyEquity(object sender, EventArgs e)
         {
-            WBVMBuyCollection.Add(new MyWebBrowserVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM));
         }
 
         /// <summary>
