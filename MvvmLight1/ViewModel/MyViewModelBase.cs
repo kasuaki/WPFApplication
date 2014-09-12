@@ -1,6 +1,4 @@
 ﻿using GalaSoft.MvvmLight;
-using System;
-using System.Windows.Controls;
 
 namespace MvvmLight1.ViewModel
 {
@@ -10,18 +8,21 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class WebBrowserVM : ViewModelBase
+    public class MyViewModelBase : ViewModelBase
     {
+        public CommonVM CVM { get; set; }
 
-        public WebBrowser WB { get; private set; }
+        public MyViewModelBase()
+        {
+
+        }
 
         /// <summary>
-        /// Initializes a new instance of the WebBrowserVM class.
+        /// Initializes a new instance of the MyViewModelBase class.
         /// </summary>
-        public WebBrowserVM(Uri aUri)
+        public MyViewModelBase(CommonVM aCVM)
         {
-            WB = new WebBrowser();
-            WB.Navigate(aUri);
+            CVM = aCVM;
         }
     }
 }

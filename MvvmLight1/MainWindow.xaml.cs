@@ -19,8 +19,7 @@ namespace MvvmLight1
             InitializeComponent();
             Closing += (s, e) => ViewModelLocator.Cleanup();
             MainViewModel aMainVM = this.DataContext as MainViewModel;
-            aMainVM.mWebBrowser = this.WB;
-            aMainVM.mWebBrowser.Navigate(new Uri(@"http://www.google.com"));
+            aMainVM.TmpGrid = this.tmpGrid;
         }
     }
 }

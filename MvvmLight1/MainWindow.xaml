@@ -21,25 +21,15 @@
         </ResourceDictionary>
     </Window.Resources>
 
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <cmd:EventToCommand Command="{Binding Path=LoadedCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid x:Name="LayoutRoot">
         <StackPanel>
-            <WebBrowser Name="WB">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="LoadCompleted">
-                        <!--
-                        <cmd:EventToCommand Command="{Binding Path=LoadCompletedCommand}" PassEventArgsToCommand="True" />
-                        -->
-                        <i:InvokeCommandAction Command="{Binding Path=LoadCompletedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type WebBrowser}}}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </WebBrowser>
-        <TextBlock FontSize="36"
-                   FontWeight="Bold"
-                   Foreground="Purple"
-                   Text="{Binding WelcomeTitle}"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   TextWrapping="Wrap" />
+            <Button Content="実行" Command="{Binding Path=ButtonClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+            <Grid Name="tmpGrid"></Grid>
 
         </StackPanel>
     </Grid>

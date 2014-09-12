@@ -8,6 +8,9 @@ using Npgsql;
 using System;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using System.Linq;
+using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace MvvmLight1.ViewModel
 {
@@ -17,117 +20,72 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : MyViewModelBase
     {
-        private WebBrowser _WebBrowser;
-        public WebBrowser mWebBrowser
+        private Grid _TmpGrid;
+        public Grid TmpGrid
         {
             get
             {
-                return _WebBrowser;
+                return _TmpGrid;
             }
-            set {
-                _WebBrowser = value;
-                RaisePropertyChanged("mWebBrowser");
-            }
-        }
-
-        /*
-        public RelayCommand<NavigationEventArgs> LoadCompletedCommand {
-            get {
-                return _LoadCompletedCommand;
-            }
-            private set {
-                _LoadCompletedCommand = value;
-            }
-        }
-        private RelayCommand<NavigationEventArgs> _LoadCompletedCommand = new RelayCommand<NavigationEventArgs>((e) =>
-        {
-            WebBrowser sender = e.Navigator as WebBrowser;
-            System.Windows.MessageBox.Show("LoadCompletedCommand");
-            WebBrowser aWB = sender as WebBrowser;
-            HTMLDocument aHTMLDocument = aWB.Document as HTMLDocument;
-            System.Windows.MessageBox.Show(aHTMLDocument.body.document.documentElement.outerHTML);
-
-        });
-        */
-        public RelayCommand<WebBrowser> LoadCompletedCommand
-        {
-            get
-            {
-                return _LoadCompletedCommand;
-            }
-            private set
-            {
-                _LoadCompletedCommand = value;
-            }
-        }
-        private RelayCommand<WebBrowser> _LoadCompletedCommand = new RelayCommand<WebBrowser>((sender) => {
-            System.Windows.MessageBox.Show("LoadCompletedCommand");
-            WebBrowser aWB = sender as WebBrowser;
-            HTMLDocument aHTMLDocument = aWB.Document as HTMLDocument;
-            System.Windows.MessageBox.Show(aHTMLDocument.body.document.documentElement.outerHTML);
-        });
-
-
-        private readonly IDataService _dataService;
-
-        /// <summary>
-        /// The <see cref="WelcomeTitle" /> property's name.
-        /// </summary>
-        public const string WelcomeTitlePropertyName = "WelcomeTitle";
-
-        private string _welcomeTitle = string.Empty;
-
-        /// <summary>
-        /// Gets the WelcomeTitle property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string WelcomeTitle
-        {
-            get
-            {
-                return _welcomeTitle;
-            }
-
             set
             {
-                if (_welcomeTitle == value)
-                {
-                    return;
-                }
-
-                _welcomeTitle = value;
-                RaisePropertyChanged(WelcomeTitlePropertyName);
+                _TmpGrid = value;
+                RaisePropertyChanged("TmpGrid");
             }
         }
+
+        Collection<IWebBrowserVM> WBVMCollection { get; set; }
+        
+        public RelayCommand<MainWindow> ButtonClickCommand
+        {
+            get
+            {
+                return _ButtonClickCommand;
+            }
+            set
+            {
+                _ButtonClickCommand = value;
+            }
+        }
+        private RelayCommand<MainWindow> _ButtonClickCommand = new RelayCommand<MainWindow>((window) =>
+        {
+            MainViewModel aMainVM = window.DataContext as MainViewModel;
+            IWebBrowserVM aMyWB = aMainVM.WBVMCollection.First();
+
+            aMyWB.WB.Navigate(aMyWB.MyUri);
+        });
+
+        public RelayCommand<RoutedEventArgs> LoadedCommand {
+            get {
+                return _LoadedCommand;
+            }
+            private set {
+                _LoadedCommand = value;
+            }
+        }
+        private RelayCommand<RoutedEventArgs> _LoadedCommand = new RelayCommand<RoutedEventArgs>((e) =>
+        {
+            MainWindow aMainWindow = e.Source as MainWindow;
+            MainViewModel aMainVM = aMainWindow.DataContext as MainViewModel;
+            IWebBrowserVM aMyWB = aMainVM.WBVMCollection.First();
+
+            aMainVM.TmpGrid.Children.Add(aMyWB.Grid);
+
+//            System.Windows.MessageBox.Show("LoadedCommand");
+        });
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public MainViewModel(IDataService dataService)
         {
-            _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        // Report error here
-                        return;
-                    }
+            CommonVM aCVM = new CommonVM();
+            CVM = aCVM;
+            WBVMCollection = new Collection<IWebBrowserVM>();
+            WBVMCollection.Add(new MyWebBrowserVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM));
 
-                    WelcomeTitle = item.Title;
-                });
-            var testdb = new TestDBWrap();
-            using(var db = new TestDBDB()) {
-                
-                db.users.ForEachAsync((users) =>
-                {
-                    System.Windows.MessageBox.Show(users.id.ToString());
-                    System.Windows.MessageBox.Show(users.code.ToString());
-                });
-            }
         }
 
         ////public override void Cleanup()
