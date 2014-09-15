@@ -28,11 +28,11 @@ namespace MvvmLight1.ViewModel
         public TestDBWrap DB { get; set; }
         public Dispatcher Dispatcher { get; set; }
 
-        // 判断イベント.
-        public event EventHandler<EventArgs> JudgeShare;
-        public virtual void OnJudgeShare(EventArgs e)
+        // 買い判断イベント.
+        public event EventHandler<EventArgs> JudgeBuyShare;
+        public virtual void OnJudgeBuyShare(EventArgs e)
         {
-            EventHandler<EventArgs> h = JudgeShare;
+            EventHandler<EventArgs> h = JudgeBuyShare;
             if (h != null)
             {
                 h(this, e);
@@ -44,6 +44,28 @@ namespace MvvmLight1.ViewModel
         public virtual void OnBuyShare(EventArgs e)
         {
             EventHandler<EventArgs> h = BuyShare;
+            if (h != null)
+            {
+                h(this, e);
+            }
+        }
+
+        // 売り判断イベント.
+        public event EventHandler<EventArgs> JudgeSellShare;
+        public virtual void OnJudgeSellShare(EventArgs e)
+        {
+            EventHandler<EventArgs> h = JudgeSellShare;
+            if (h != null)
+            {
+                h(this, e);
+            }
+        }
+
+        // 売イベント.
+        public event EventHandler<EventArgs> SellShare;
+        public virtual void OnSellShare(EventArgs e)
+        {
+            EventHandler<EventArgs> h = SellShare;
             if (h != null)
             {
                 h(this, e);

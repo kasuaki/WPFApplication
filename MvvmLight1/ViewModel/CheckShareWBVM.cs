@@ -34,6 +34,10 @@ namespace MvvmLight1.ViewModel
             : base(aUri, aCommonVM, aColumn, aRow)
         {
             LoadCompletedCommand = new RelayCommand<WebBrowser>(LoadCompletedEvent);
+            CVM.JudgeBuyShare += CVM_JudgeBuyShare;
+            CVM.BuyShare += CVM_BuyShare;
+            CVM.JudgeSellShare += CVM_JudgeSellShare;
+            CVM.SellShare += CVM_SellShare;
         }
 
         /// <summary>
@@ -113,8 +117,20 @@ namespace MvvmLight1.ViewModel
                 IHTMLElement tanka = tdList.First(element => ((element.innerText != null) && (element.innerText.Equals(@"保有株数"))));
                 IHTMLElement table = tanka.parentElement.parentElement.parentElement;
 
-                // 解析.
-//                CVM.DB.AnalysisShare(table);
+                // 保存.
+                CVM.DB.AnalysisShare(table);
+
+                if (Status.Watching.Equals(MyStatus))
+                {
+                    CVM.OnJudgeBuyShare(new EventArgs());
+                }
+                else if (Status.HaveShares.Equals(MyStatus))
+                {
+                    CVM.OnJudgeSellShare(new EventArgs());
+                }
+                else
+                {
+                }
             }
         }
 
@@ -127,5 +143,61 @@ namespace MvvmLight1.ViewModel
         {
             PageUpdate();
         }
+
+
+        /// <summary>
+        /// 株買う通知処理.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CVM_BuyShare(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 買い判断通知処理.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void CVM_JudgeBuyShare(object sender, EventArgs e)
+        {
+            // 判断.
+            Tuple<Boolean, Int32> result = await CVM.DB.JudgeBuy();
+
+            // 購入依頼.
+            if (result.Item1)
+            {
+                CVM.OnBuyShare(new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// 株売る通知処理.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CVM_SellShare(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 売り判断通知処理.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void CVM_JudgeSellShare(object sender, EventArgs e)
+        {
+            // 判断.
+            Tuple<Boolean, Int32> result = await CVM.DB.JudgeSell();
+
+            // 売却依頼.
+            if (result.Item1)
+            {
+                CVM.OnSellShare(new EventArgs());
+            }
+        }
+
     }
 }

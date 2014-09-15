@@ -50,7 +50,7 @@ namespace MvvmLight1.ViewModel
             MainViewModel aMainVM = window.DataContext as MainViewModel;
             IWebBrowserVM aMyWB = aMainVM.WBVMWatchCollection.First();
 
-            await CVM.DB.JudgeBuyCell();
+            await CVM.DB.JudgeBuy();
         }
         private RelayCommand<MainWindow> _ButtonClickCommand;
         public RelayCommand<MainWindow> ButtonClickCommand
@@ -112,40 +112,12 @@ namespace MvvmLight1.ViewModel
             ButtonClickCommand = new RelayCommand<MainWindow>(ButtonClickCommandEventHandler);
 
             CVM = new CommonVM(aDispatcher);
-            CVM.JudgeShare += CVM_AnalysisEnd;
-            CVM.BuyShare += CVM_BuyEquity;
 
             WBVMBuyCollection = new Collection<IWebBrowserVM>();
             WBVMWatchCollection = new Collection<IWebBrowserVM>();
             WBVMWatchCollection.Add(new MyWebBrowserVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM, 0, 1));
             WBVMWatchCollection.Add(new CheckShareWBVM(new Uri(@"https://site2.sbisec.co.jp/ETGate/"), CVM, 0, 2));
 
-        }
-
-        /// <summary>
-        /// 株買う通知処理.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void CVM_BuyEquity(object sender, EventArgs e)
-        {
-        }
-
-        /// <summary>
-        /// 解析完了通知後処理.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void CVM_AnalysisEnd(object sender, EventArgs e)
-        {
-            // 判断.
-            Tuple<Boolean, Int32> result = await CVM.DB.JudgeBuyCell();
-
-            // 購入依頼.
-            if (result.Item1)
-            {
-                CVM.OnBuyShare(new EventArgs());
-            }
         }
 
         ////public override void Cleanup()

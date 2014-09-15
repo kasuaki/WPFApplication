@@ -15,11 +15,12 @@ namespace DataModels
 	/// <summary>
 	/// Database       : TestDB
 	/// Data Source    : localhost
-	/// Server Version : 9.3.2
+	/// Server Version : 9.3.5
 	/// </summary>
 	public partial class TestDBDB : LinqToDB.Data.DataConnection
 	{
 		public ITable<portfolio> portfolios { get { return this.GetTable<portfolio>(); } }
+		public ITable<share>     shares     { get { return this.GetTable<share>(); } }
 		public ITable<user>      users      { get { return this.GetTable<user>(); } }
 
 		public TestDBDB()
@@ -54,6 +55,21 @@ namespace DataModels
 		[Column,        Nullable] public DateTime? 更新日時    { get; set; } // timestamp (6) without time zone
 	}
 
+	[Table(Schema="public", Name="share")]
+	public partial class share
+	{
+		[PrimaryKey, Identity   ] public int       id    { get; set; } // integer
+		[Column,     NotNull    ] public string    銘柄    { get; set; } // text
+		[Column,        Nullable] public int?      銘柄コード { get; set; } // integer
+		[Column,        Nullable] public int?      保有株数  { get; set; } // integer
+		[Column,        Nullable] public int?      取得単価  { get; set; } // integer
+		[Column,        Nullable] public int?      現在値   { get; set; } // integer
+		[Column,        Nullable] public int?      評価損益  { get; set; } // integer
+		[Column,        Nullable] public string    備考    { get; set; } // text
+		[Column,        Nullable] public DateTime? 削除日時  { get; set; } // timestamp (6) without time zone
+		[Column,        Nullable] public DateTime? 更新日時  { get; set; } // timestamp (6) without time zone
+	}
+
 	[Table(Schema="public", Name="users")]
 	public partial class user
 	{
@@ -64,6 +80,12 @@ namespace DataModels
 	public static partial class TableExtensions
 	{
 		public static portfolio Find(this ITable<portfolio> table, int id)
+		{
+			return table.FirstOrDefault(t =>
+				t.id == id);
+		}
+
+		public static share Find(this ITable<share> table, int id)
 		{
 			return table.FirstOrDefault(t =>
 				t.id == id);

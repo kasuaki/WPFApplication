@@ -182,12 +182,6 @@ namespace MvvmLight1.ViewModel
 
                 // 解析.
                 CVM.DB.AnalysisPortfolio(table);
-
-                if ((Status.Watching.Equals(MyStatus)) ||
-                    (Status.HaveShares.Equals(MyStatus)))
-                {
-                    CVM.OnJudgeShare(new EventArgs());
-                }
             }
         }
 
