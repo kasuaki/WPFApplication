@@ -15,7 +15,7 @@ namespace DataModels
 	/// <summary>
 	/// Database       : TestDB
 	/// Data Source    : localhost
-	/// Server Version : 9.3.5
+	/// Server Version : 9.3.2
 	/// </summary>
 	public partial class TestDBDB : LinqToDB.Data.DataConnection
 	{
@@ -61,6 +61,9 @@ namespace DataModels
 		[PrimaryKey, Identity   ] public int       id    { get; set; } // integer
 		[Column,     NotNull    ] public string    銘柄    { get; set; } // text
 		[Column,        Nullable] public int?      銘柄コード { get; set; } // integer
+		[Column,        Nullable] public string    銘柄リンク { get; set; } // text
+		[Column,        Nullable] public string    現買リンク { get; set; } // text
+		[Column,        Nullable] public string    現売リンク { get; set; } // text
 		[Column,        Nullable] public int?      保有株数  { get; set; } // integer
 		[Column,        Nullable] public int?      取得単価  { get; set; } // integer
 		[Column,        Nullable] public int?      現在値   { get; set; } // integer

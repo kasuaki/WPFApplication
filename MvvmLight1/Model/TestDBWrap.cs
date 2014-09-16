@@ -13,12 +13,13 @@ using LinqToDB;
 using LinqToDB.Linq;
 using System.Net;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace MvvmLight1.Model
 {
-    public class TestDBWrap
+    public class TestDBWrap : IDisposable
     {
-        private NpgsqlConnection mNpgsqlConnection;
+//        private NpgsqlConnection mNpgsqlConnection;
 
         private TestDBDB _TestDB;
         public TestDBDB TestDB
@@ -89,6 +90,23 @@ namespace MvvmLight1.Model
                             String NameStr = str.Substring(4);
                             NameStr = NameStr.Trim();
                             share.銘柄 = NameStr;
+                            break;
+                        case 1:
+                            CQ tdCQ = new CQ(ele.InnerHTML);
+                            CQ aList = tdCQ["a"];
+                            aList.Each((Int32 JetBrains, IDomObject e) =>
+                            {
+                                String s = SanitizeString(e);
+                                if ("現売".Equals(s))
+                                {
+                                    share.現売リンク = @"https://site2.sbisec.co.jp" + e.GetAttribute("href");
+                                }
+                                else if ("現買".Equals(s))
+                                {
+                                    share.現買リンク = @"https://site2.sbisec.co.jp" + e.GetAttribute("href");
+                                }
+                            });
+                            
                             break;
                         default:
                             break;
@@ -166,42 +184,58 @@ namespace MvvmLight1.Model
 
                     int? k = i;
                     String[] strArr = null;
+                    int tmpInteger;
                     // 格納.
                     switch (k)
                     {
                         case 1:
                             String codeStr = str.Substring(0, 4);
-                            pf.銘柄コード = Int32.Parse(codeStr);
+                            if (Int32.TryParse(codeStr, out tmpInteger)) { pf.銘柄コード = tmpInteger; }
                             String NameStr = str.Substring(4);
                             NameStr = NameStr.Trim();
                             pf.銘柄 = NameStr;
                             break;
                         case 2:
                             strArr = str.Split(new String[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                            pf.買付日 = new DateTime(Int32.Parse("20" + strArr[0]), Int32.Parse(strArr[1]), Int32.Parse(strArr[2]));
+                            Int32 aYear, aMonth, aDay;
+                            if ((Int32.TryParse("20" + strArr[0], out aYear)) &&
+                                (Int32.TryParse(strArr[1], out aMonth)) &&
+                                (Int32.TryParse(strArr[2], out aDay)))
+                            {
+                                pf.買付日 = new DateTime(aYear, aMonth, aDay);
+                            }
                             break;
                         case 3:
-                            pf.数量 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.数量 = tmpInteger; }
                             break;
                         case 4:
-                            pf.参考単価 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.参考単価 = tmpInteger; }
                             break;
                         case 5:
-                            pf.現在値 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.現在値 = tmpInteger; }
                             break;
                         case 6:
-                            pf.前日比 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.前日比 = tmpInteger; }
                             break;
                         case 7:
-                            pf.損益 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.損益 = tmpInteger; }
                             break;
                         case 8:
-                            pf.損益パーセント = float.Parse(str);
+                            float tmpFloat;
+                            if (float.TryParse(str, out tmpFloat)) { pf.損益パーセント = tmpFloat; }
                             break;
                         case 9:
-                            pf.評価額 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { pf.評価額 = tmpInteger; }
                             break;
                         case 0:
+                            CQ anchorCQ = new CQ(ele.InnerHTML);
+                            CQ anchorList = anchorCQ["a"];
+                            KeyValuePair<String, String> anchor;
+                            anchor = anchorList[0].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
+                            pf.現買リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
+                            anchor = anchorList[1].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
+                            pf.現売リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
+                            break;
                         case 10:
                         default:
                             break;
@@ -221,10 +255,11 @@ namespace MvvmLight1.Model
         /// <summary>
         /// 購入是非判断.
         /// </summary>
-        public async Task<Tuple<Boolean, Int32>> JudgeBuy()
+        public  Tuple<Boolean, Int32> JudgeBuy()
         {
-            Boolean aCanBuySell = true;
+            Boolean aCanBuySell = false;
             Int32 code = 0;
+            Int32 checkCount = 3;   // 何回前までさかのぼってチェックするか.
 
             using (TestDB)
             {
@@ -236,7 +271,7 @@ namespace MvvmLight1.Model
                     code = (Int32)tmpcode;
                     IEnumerable<portfolio> latest = TestDB.portfolios.Where(p => tmpcode.Equals(p.銘柄コード))
                                                   .OrderByDescending((portfolio p) => p.更新日時)
-                                                  .Take(3).Select(p => p).ToList();
+                                                  .Take(checkCount).Select(p => p).ToList();
                     latest = latest.Reverse();
 
                     portfolio beforeP = null;
@@ -268,6 +303,9 @@ namespace MvvmLight1.Model
                 }
             }
 
+            /* ※※※※※※※※※※※※※※※※※ */
+//            aCanBuySell = true;
+            /* ※※※※※※※※※※※※※※※※※ */
             Tuple<Boolean, Int32> returnObj = new Tuple<bool, int>(aCanBuySell, code);
             return returnObj;
         }
@@ -275,9 +313,9 @@ namespace MvvmLight1.Model
         /// <summary>
         /// 売却是非判断.
         /// </summary>
-        public async Task<Tuple<Boolean, Int32>> JudgeSell()
+        public  Tuple<Boolean, Int32> JudgeSell()
         {
-            Boolean aCanBuySell = true;
+            Boolean aCanBuySell = false;
             Int32 code = 0;
 
             using (TestDB)
@@ -330,6 +368,9 @@ namespace MvvmLight1.Model
                 }
             }
 
+            /* ※※※※※※※※※※※※※※※※※ */
+//            aCanBuySell = true;
+            /* ※※※※※※※※※※※※※※※※※ */
             Tuple<Boolean, Int32> returnObj = new Tuple<bool, int>(aCanBuySell, code);
             return returnObj;
         }
@@ -339,7 +380,7 @@ namespace MvvmLight1.Model
         /// </summary>
         /// <param name="ele"></param>
         /// <returns></returns>
-        protected String SanitizeString(IDomObject ele)
+        public String SanitizeString(IDomObject ele)
         {
             // tdの文字列.
             String str = ele.InnerText;
@@ -364,5 +405,10 @@ namespace MvvmLight1.Model
 
             return str;
         }
+
+        public void Dispose()
+        {
+            _TestDB.Dispose();
+        }    
     }
 }

@@ -24,6 +24,8 @@ namespace MvvmLight1.ViewModel
     /// </summary>
     public class CommonVM : MyViewModelBase
     {
+        public Uri MyUri = new Uri(@"https://site2.sbisec.co.jp/ETGate/");
+
         public TaskScheduler UI { get; set; }
         public TestDBWrap DB { get; set; }
         public Dispatcher Dispatcher { get; set; }
@@ -40,10 +42,21 @@ namespace MvvmLight1.ViewModel
         }
 
         // 買イベント.
-        public event EventHandler<EventArgs> BuyShare;
-        public virtual void OnBuyShare(EventArgs e)
+        public event EventHandler<BuySellEventArgs> BuyShare;
+        public virtual void OnBuyShare(BuySellEventArgs e)
         {
-            EventHandler<EventArgs> h = BuyShare;
+            EventHandler<BuySellEventArgs> h = BuyShare;
+            if (h != null)
+            {
+                h(this, e);
+            }
+        }
+
+        // 買完了イベント.
+        public event EventHandler<BuySellEventArgs> BuyShareEnd;
+        public virtual void OnBuyShareEnd(BuySellEventArgs e)
+        {
+            EventHandler<BuySellEventArgs> h = BuyShareEnd;
             if (h != null)
             {
                 h(this, e);
@@ -62,16 +75,27 @@ namespace MvvmLight1.ViewModel
         }
 
         // 売イベント.
-        public event EventHandler<EventArgs> SellShare;
-        public virtual void OnSellShare(EventArgs e)
+        public event EventHandler<BuySellEventArgs> SellShare;
+        public virtual void OnSellShare(BuySellEventArgs e)
         {
-            EventHandler<EventArgs> h = SellShare;
+            EventHandler<BuySellEventArgs> h = SellShare;
             if (h != null)
             {
                 h(this, e);
             }
         }
 
+        // 売完了イベント.
+        public event EventHandler<BuySellEventArgs> SellShareEnd;
+        public virtual void OnSellShareEnd(BuySellEventArgs e)
+        {
+            EventHandler<BuySellEventArgs> h = SellShareEnd;
+            if (h != null)
+            {
+                h(this, e);
+            }
+        }
+ 
         /// <summary>
         /// Initializes a new instance of the CommonVM class.
         /// </summary>
@@ -115,6 +139,16 @@ namespace MvvmLight1.ViewModel
                 iniFileName);   // iniファイル名
 
             return sb.ToString();
+        }
+    }
+
+    public class BuySellEventArgs : EventArgs
+    {
+        public Int32 Code;
+
+        public BuySellEventArgs(Int32 aCode)
+        {
+            Code = aCode;
         }
     }
 }

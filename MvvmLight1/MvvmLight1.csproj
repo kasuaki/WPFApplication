@@ -100,13 +100,18 @@
     <Compile Include="MyWebBrowser.xaml.cs">
       <DependentUpon>MyWebBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\BuySellShareBaseVM.cs" />
+    <Compile Include="ViewModel\SellShareVM.cs" />
     <Compile Include="ViewModel\CommonVM.cs" />
+    <Compile Include="ViewModel\ISellShareVM.cs" />
+    <Compile Include="ViewModel\IBuyShareVM.cs" />
     <Compile Include="ViewModel\IWebBrowserVM.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MyViewModelBase.cs" />
     <Compile Include="ViewModel\CheckShareWBVM.cs" />
+    <Compile Include="ViewModel\BuyShareVM.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
-    <Compile Include="ViewModel\MyWebBrowserVM.cs" />
+    <Compile Include="ViewModel\CheckPortfolioWBVM.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

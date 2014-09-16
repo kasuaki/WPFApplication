@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace MvvmLight1.ViewModel
 {
@@ -20,7 +21,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class MyWebBrowserVM : MyViewModelBase, IWebBrowserVM
+    public class CheckPortfolioWBVM : MyViewModelBase, IWebBrowserVM
     {
         public DispatcherTimer _MyDispatcherTimer;
         public DispatcherTimer MyDispatcherTimer
@@ -36,6 +37,7 @@ namespace MvvmLight1.ViewModel
         public Status MyStatus { get; set; }
         public String User;
         public String Pass;
+        public String Portfolio { get; set; }
 
         protected RelayCommand<WebBrowser> _LoadCompletedCommand;
         public RelayCommand<WebBrowser> LoadCompletedCommand
@@ -58,7 +60,7 @@ namespace MvvmLight1.ViewModel
         /// <summary>
         /// Initializes a new instance of the WebBrowserVM class.
         /// </summary>
-        public MyWebBrowserVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow)
+        public CheckPortfolioWBVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow, String aPortfolio)
             : base(aCommonVM)
         {
             MyGrid = new MyWebBrowser();
@@ -70,6 +72,7 @@ namespace MvvmLight1.ViewModel
             MyUri = aUri;
             WB = this.MyGrid.Children.OfType<WebBrowser>().First();
             MyStatus = Status.Watching;
+            Portfolio = aPortfolio;
 
             _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(60 * TimeSpan.TicksPerSecond),
                                                      DispatcherPriority.Normal,
@@ -175,13 +178,38 @@ namespace MvvmLight1.ViewModel
             // ポートフォリオ画面(想定).
             else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"ポートフォリオ名")) != 0)
             {
-                // テーブル取得.
-                var tdList = aHTMLDocument.getElementsByTagName("td").Cast<IHTMLElement>();
-                IHTMLElement tanka = tdList.First(element => ((element.innerText != null) && (element.innerText.Equals(@"参考単価"))));
-                IHTMLElement table = tanka.parentElement.parentElement.parentElement;
+                var optionList = aHTMLDocument.getElementsByTagName("option").Cast<IHTMLElement>();
 
-                // 解析.
-                CVM.DB.AnalysisPortfolio(table);
+                var value = optionList.Where(e => e.innerText != null).Where(e =>
+                {
+                    String str = e.innerText;
+                    str = WebUtility.HtmlDecode(str);
+
+                    return Portfolio.Equals(str);
+                }).Select(e => e.getAttribute("value")).First();
+
+                var selectList = aHTMLDocument.getElementsByTagName("select").Cast<IHTMLElement>();
+                var select = selectList.Where(e => e.getAttribute("name") != null).First(e => "portforio_id".Equals(e.getAttribute("name")));
+
+                var currentSelect = select.getAttribute("value");
+                if (currentSelect != value)
+                {
+                    select.setAttribute("value", value);
+
+                    var viewPfButton = inputList.Where(e => e.getAttribute("name") != null).First(e => "ACT_viewPf".Equals(e.getAttribute("name")));
+                    viewPfButton.click();
+                }
+                else
+                {
+
+                    // テーブル取得.
+                    var tdList = aHTMLDocument.getElementsByTagName("td").Cast<IHTMLElement>();
+                    IHTMLElement tanka = tdList.First(element => ((element.innerText != null) && (element.innerText.Equals(@"参考単価"))));
+                    IHTMLElement table = tanka.parentElement.parentElement.parentElement;
+
+                    // 解析.
+                    CVM.DB.AnalysisPortfolio(table);
+                }
             }
         }
 
