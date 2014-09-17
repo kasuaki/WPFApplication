@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using System;
 
 namespace MvvmLight1.ViewModel
 {
@@ -8,7 +9,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class MyViewModelBase : ViewModelBase
+    public abstract class MyViewModelBase : ViewModelBase
     {
         public CommonVM CVM { get; set; }
 

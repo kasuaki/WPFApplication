@@ -74,7 +74,7 @@ namespace MvvmLight1.ViewModel
             MyStatus = Status.Watching;
             Portfolio = aPortfolio;
 
-            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(60 * TimeSpan.TicksPerSecond),
+            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(30 * TimeSpan.TicksPerSecond),
                                                      DispatcherPriority.Normal,
                                                      MyDispatcherTimer_Tick,
                                                      Dispatcher.CurrentDispatcher) { IsEnabled = false };
@@ -221,6 +221,11 @@ namespace MvvmLight1.ViewModel
         protected virtual void MyDispatcherTimer_Tick(Object sender, EventArgs e)
         {
             PageUpdate();
+        }
+
+        public virtual void Dispose()
+        {
+            WB.Dispose();
         }
     }
 }

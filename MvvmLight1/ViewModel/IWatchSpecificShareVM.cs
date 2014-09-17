@@ -8,21 +8,19 @@ using System.Windows.Threading;
 
 namespace MvvmLight1.ViewModel
 {
-    interface IWebBrowserVM : IDisposable
+    public interface IWatchSpecificShareVM : IDisposable
     {
-        DispatcherTimer MyDispatcherTimer { get; }
+        Panel MyPanel { get; set; }
         Uri MyUri { get; set; }
         WebBrowser WB { get; }
         Status MyStatus { get; set; }
+        Int32 Code { get; set; }
 
 
 
         void WebBrowserAdd(Panel aPanel);
-        void WebBrowserRemove(Panel aPanel);
-        void TimerStart();
-        void TimerStop();
-        void WatchStart();
-        void PageUpdate();
+        void WebBrowserRemove();
+        void WatchShare();
         void Dispose();
     }
 }

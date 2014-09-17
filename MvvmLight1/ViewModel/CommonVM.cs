@@ -22,7 +22,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class CommonVM : MyViewModelBase
+    public class CommonVM : MyViewModelBase, IDisposable
     {
         public Uri MyUri = new Uri(@"https://site2.sbisec.co.jp/ETGate/");
 
@@ -139,6 +139,14 @@ namespace MvvmLight1.ViewModel
                 iniFileName);   // iniファイル名
 
             return sb.ToString();
+        }
+
+        public void Dispose()
+        {
+            DB.Dispose();
+            DB = null;
+            UI = null;
+            Dispatcher = null;
         }
     }
 

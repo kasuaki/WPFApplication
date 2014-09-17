@@ -162,6 +162,7 @@ namespace MvvmLight1.Model
         /// <summary>
         /// ポートフォリオ解析.
         /// </summary>
+        /// <param name="aElement"></param>
         public void AnalysisPortfolio(IHTMLElement aElement)
         {
             CQ table = new CQ(aElement.innerHTML);
@@ -253,13 +254,39 @@ namespace MvvmLight1.Model
         }
 
         /// <summary>
+        /// 特定の株式画面解析.
+        /// </summary>
+        /// <param name="aElement"></param>
+        public void AnalysisSpecificShare(IHTMLElement aElement, Int32 Code)
+        {
+            CQ table = new CQ(aElement.innerHTML);
+            CQ spanCQ = table["#MTB0_0 span[class=fxx01]"];
+
+            portfolio pf = new portfolio();
+            pf.銘柄コード = Code;
+            Int32 tmpIndex;
+            if (Int32.TryParse(spanCQ[0].InnerText, out tmpIndex))
+            {
+                pf.現在値 = tmpIndex;
+
+                pf.更新日時 = DateTime.Now;
+
+                using (TestDB)
+                {
+                    // 保存.
+                    TestDB.Insert(pf);
+                }
+            }
+        }
+
+        /// <summary>
         /// 購入是非判断.
         /// </summary>
         public  Tuple<Boolean, Int32> JudgeBuy()
         {
             Boolean aCanBuySell = false;
             Int32 code = 0;
-            Int32 checkCount = 3;   // 何回前までさかのぼってチェックするか.
+            Int32 checkCount = 6;   // 何回前までさかのぼってチェックするか.
 
             using (TestDB)
             {
@@ -269,31 +296,38 @@ namespace MvvmLight1.Model
                 foreach(int? tmpcode in codeList)
                 {
                     code = (Int32)tmpcode;
+
                     IEnumerable<portfolio> latest = TestDB.portfolios.Where(p => tmpcode.Equals(p.銘柄コード))
                                                   .OrderByDescending((portfolio p) => p.更新日時)
                                                   .Take(checkCount).Select(p => p).ToList();
                     latest = latest.Reverse();
 
-                    portfolio beforeP = null;
-                    foreach (portfolio p in latest)
+                    Int32 first現在値 = latest.First().現在値 ?? 0;
+                    Int32 last現在値 = latest.Last().現在値 ?? 0;
+                    Int32 差分 = last現在値 - first現在値;
+                    if (差分 >= 5)
                     {
-                        if (beforeP == null)
+                        portfolio beforeP = null;
+                        foreach (portfolio p in latest)
                         {
+                            if (beforeP == null)
+                            {
+                                beforeP = p;
+                                continue;
+                            }
+
+                            if (beforeP.現在値 < p.現在値)
+                            {
+                                aCanBuySell = true;
+                            }
+                            else
+                            {
+                                aCanBuySell = false;
+                                break;
+                            }
+
                             beforeP = p;
-                            continue;
                         }
-
-                        if (beforeP.現在値 < p.現在値)
-                        {
-                            aCanBuySell = true;
-                        }
-                        else
-                        {
-                            aCanBuySell = false;
-                            break;
-                        }
-
-                        beforeP = p;
                     }
 
                     if (aCanBuySell)

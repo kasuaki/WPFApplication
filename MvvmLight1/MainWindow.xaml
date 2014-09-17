@@ -26,6 +26,9 @@
         <i:EventTrigger EventName="Loaded">
             <cmd:EventToCommand Command="{Binding Path=LoadedCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <cmd:EventToCommand Command="{Binding Path=ClosedCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid x:Name="LayoutRoot">
         <Grid Name="tmpGrid">

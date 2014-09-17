@@ -101,6 +101,8 @@
       <DependentUpon>MyWebBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\BuySellShareBaseVM.cs" />
+    <Compile Include="ViewModel\WatchSpecificShareVM.cs" />
+    <Compile Include="ViewModel\IWatchSpecificShareVM.cs" />
     <Compile Include="ViewModel\SellShareVM.cs" />
     <Compile Include="ViewModel\CommonVM.cs" />
     <Compile Include="ViewModel\ISellShareVM.cs" />

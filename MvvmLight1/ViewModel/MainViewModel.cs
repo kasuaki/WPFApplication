@@ -22,7 +22,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class MainViewModel : MyViewModelBase
+    public class MainViewModel : MyViewModelBase, IDisposable
     {
         private Panel _TmpGrid;
         public Panel TmpGrid
@@ -41,6 +41,7 @@ namespace MvvmLight1.ViewModel
         Collection<IWebBrowserVM> WBVMWatchCollection { get; set; }
         public IBuyShareVM BuyShareVM;
         public ISellShareVM SellShareVM;
+        public Collection<IWatchSpecificShareVM> WatchSpecificShareVMCollection { get; set; }
         
         /// <summary>
         /// ボタン実行処理.
@@ -64,6 +65,30 @@ namespace MvvmLight1.ViewModel
             {
                 _ButtonClickCommand = value;
                 RaisePropertyChanged("ButtonClickCommand");
+            }
+        }
+
+
+        /// <summary>
+        /// WindowのLoaded完了時の処理.
+        /// 登録されているWebBrowserコレクションを回してTimerStart.
+        /// </summary>
+        /// <param name="e"></param>
+        private void ClosedCommandEventHandler(EventArgs e)
+        {
+            Dispose();
+        }
+        private RelayCommand<EventArgs> _ClosedCommand;
+        public RelayCommand<EventArgs> ClosedCommand
+        {
+            get
+            {
+                return _ClosedCommand;
+            }
+            private set
+            {
+                _ClosedCommand = value;
+                RaisePropertyChanged("ClosedCommand");
             }
         }
 
@@ -93,6 +118,12 @@ namespace MvvmLight1.ViewModel
 
 //                counter *= 2;
             });
+
+            WatchSpecificShareVMCollection.ToList().ForEach((element) => {
+                element.WebBrowserAdd(TmpGrid);
+
+                CVM.Dispatcher.BeginInvoke(new Action(() => { element.WB.Navigate(CVM.MyUri); }));
+            });
         }
         private RelayCommand<RoutedEventArgs> _LoadedCommand;
         public RelayCommand<RoutedEventArgs> LoadedCommand
@@ -104,7 +135,7 @@ namespace MvvmLight1.ViewModel
             private set
             {
                 _LoadedCommand = value;
-                RaisePropertyChanged("LoadCompletedCommand");
+                RaisePropertyChanged("LoadedCommand");
             }
         }
 
@@ -114,6 +145,7 @@ namespace MvvmLight1.ViewModel
         public MainViewModel(Dispatcher aDispatcher)
         {
             LoadedCommand = new RelayCommand<RoutedEventArgs>(LoadedCommandEventHandler);
+            ClosedCommand = new RelayCommand<EventArgs>(ClosedCommandEventHandler);
             ButtonClickCommand = new RelayCommand<MainWindow>(ButtonClickCommandEventHandler);
 
             CVM = new CommonVM(aDispatcher);
@@ -121,6 +153,9 @@ namespace MvvmLight1.ViewModel
             WBVMWatchCollection = new Collection<IWebBrowserVM>();
             WBVMWatchCollection.Add(new CheckPortfolioWBVM(CVM.MyUri, CVM, 0, 1, "角川ドワンゴ"));
             WBVMWatchCollection.Add(new CheckShareWBVM(CVM.MyUri, CVM, 0, 2));
+
+            WatchSpecificShareVMCollection = new Collection<IWatchSpecificShareVM>();
+//            WatchSpecificShareVMCollection.Add(new WatchSpecificShareVM(CVM.MyUri, CVM, 0, 3, 3715));
 
             CVM.BuyShare += CVM_BuyShare;
             CVM.BuyShareEnd += CVM_BuyShareEnd;
@@ -192,6 +227,37 @@ namespace MvvmLight1.ViewModel
             }, null, 3000, System.Threading.Timeout.Infinite);
         }
 
+        public void Dispose()
+        {
+            WBVMWatchCollection.ToList().ForEach(o =>
+            {
+                o.Dispose();
+            });
+            WBVMWatchCollection.Clear();
+            WBVMWatchCollection = null;
+
+            if (BuyShareVM != null)
+            {
+                BuyShareVM.Dispose();
+                BuyShareVM = null;
+            }
+
+            if (SellShareVM != null)
+            {
+                SellShareVM.Dispose();
+                SellShareVM = null;
+            }
+
+            WatchSpecificShareVMCollection.ToList().ForEach(o =>
+            {
+                o.Dispose();
+            });
+            WatchSpecificShareVMCollection.Clear();
+            WatchSpecificShareVMCollection = null;
+
+            CVM.Dispose();
+            CVM = null;
+        }
         ////public override void Cleanup()
         ////{
         ////    // Clean up if needed
