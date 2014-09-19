@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace MvvmLight1.ViewModel
     {
         Panel MyPanel { get; set; }
         Uri MyUri { get; set; }
-        WebBrowser WB { get; }
+        WebBrowser WB { get; set; }
         Status MyStatus { get; set; }
         Int32 Code { get; set; }
 

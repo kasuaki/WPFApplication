@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
 using System.Net;
+using System.ComponentModel.Composition;
 
 namespace MvvmLight1.ViewModel
 {
@@ -21,38 +22,13 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class CheckPortfolioWBVM : MyViewModelBase, IWebBrowserVM
+    [Export(typeof(ICheckPortfolioWBVM))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class CheckPortfolioWBVM : ACheckWBVM, ICheckPortfolioWBVM
     {
-        public DispatcherTimer _MyDispatcherTimer;
-        public DispatcherTimer MyDispatcherTimer
-        {
-            get
-            {
-                return _MyDispatcherTimer;
-            }
-        }
-        public Uri MyUri { get; set; }
-        public MyWebBrowser MyGrid { get; set; }
-        public WebBrowser WB { get; set; }
-        public Status MyStatus { get; set; }
-        public String User;
-        public String Pass;
         public String Portfolio { get; set; }
 
-        protected RelayCommand<WebBrowser> _LoadCompletedCommand;
-        public RelayCommand<WebBrowser> LoadCompletedCommand
-        {
-            get
-            {
-                return _LoadCompletedCommand;
-            }
-            protected set
-            {
-                _LoadCompletedCommand = value;
-                RaisePropertyChanged("LoadCompletedCommand");
-            }
-        }
-        protected virtual void LoadCompletedEvent(WebBrowser sender)
+        protected override void LoadCompletedEvent(WebBrowser sender)
         {
             WatchStart();
         }
@@ -60,57 +36,21 @@ namespace MvvmLight1.ViewModel
         /// <summary>
         /// Initializes a new instance of the WebBrowserVM class.
         /// </summary>
-        public CheckPortfolioWBVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow, String aPortfolio)
-            : base(aCommonVM)
+        [ImportingConstructor]
+        public CheckPortfolioWBVM([Import("ICheckPortfolioWBVM.aUri")] Uri aUri,
+                                  [Import("ICheckPortfolioWBVM.aCommonVM")] CommonVM aCommonVM,
+                                  [Import("ICheckPortfolioWBVM.aColumn")] Int32 aColumn,
+                                  [Import("ICheckPortfolioWBVM.aRow")] Int32 aRow,
+                                  [Import("ICheckPortfolioWBVM.aPortFolio")] String aPortFolio)
+            : base(aUri, aCommonVM, aColumn, aRow)
         {
-            MyGrid = new MyWebBrowser();
-            MyGrid.DataContext = this;
-            Grid.SetRow(MyGrid, aRow);
-            Grid.SetColumn(MyGrid, aColumn);
-            Grid.SetColumnSpan(MyGrid, 3);
-
-            MyUri = aUri;
-            WB = this.MyGrid.Children.OfType<WebBrowser>().First();
-            MyStatus = Status.Watching;
-            Portfolio = aPortfolio;
-
-            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(30 * TimeSpan.TicksPerSecond),
-                                                     DispatcherPriority.Normal,
-                                                     MyDispatcherTimer_Tick,
-                                                     Dispatcher.CurrentDispatcher) { IsEnabled = false };
-
-            LoadCompletedCommand = new RelayCommand<WebBrowser>(LoadCompletedEvent);
-
-            User = CVM.GetIniData("login.ini", "LOGIN", "USER");
-            Pass = CVM.GetIniData("login.ini", "LOGIN", "PASS");
-        }
-
-        public void WebBrowserAdd(Panel aPanel)
-        {
-            aPanel.Children.Add(MyGrid);
-        }
-
-        public void WebBrowserRemove(Panel aPanel)
-        {
-            aPanel.Children.Remove(MyGrid);
-        }
-
-        public void TimerStart()
-        {
-            MyDispatcherTimer.IsEnabled = true;
-            MyDispatcherTimer.Start();
-        }
-
-        public void TimerStop()
-        {
-            MyDispatcherTimer.Stop();
-            MyDispatcherTimer.IsEnabled = false;
+            Portfolio = aPortFolio;
         }
 
         /// <summary>
         /// ページ更新処理.
         /// </summary>
-        public virtual void PageUpdate()
+        public override void PageUpdate()
         {
             if (WB.Document != null)
             {
@@ -140,7 +80,7 @@ namespace MvvmLight1.ViewModel
         /// <summary>
         /// 監視処理.
         /// </summary>
-        public virtual void WatchStart()
+        public override void WatchStart()
         {
             HTMLDocument aHTMLDocument = WB.Document as HTMLDocument;
 
@@ -211,21 +151,6 @@ namespace MvvmLight1.ViewModel
                     CVM.DB.AnalysisPortfolio(table);
                 }
             }
-        }
-
-        /// <summary>
-        /// Timer満了時の動作.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void MyDispatcherTimer_Tick(Object sender, EventArgs e)
-        {
-            PageUpdate();
-        }
-
-        public virtual void Dispose()
-        {
-            WB.Dispose();
         }
     }
 }

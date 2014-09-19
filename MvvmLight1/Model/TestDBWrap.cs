@@ -54,7 +54,10 @@ namespace MvvmLight1.Model
         {
             using (TestDB)
             {
-                TestDB.shares.Delete();
+                lock (TestDB)
+                {
+                    TestDB.shares.Delete();
+                }
             }
 
             CQ table = new CQ(aElement.innerHTML);
@@ -153,8 +156,11 @@ namespace MvvmLight1.Model
 
                 using (TestDB)
                 {
-                    // 保存.
-                    TestDB.Insert(share);
+                    lock (TestDB)
+                    {
+                        // 保存.
+                        TestDB.Insert(share);
+                    }
                 }
             }
         }
@@ -165,92 +171,95 @@ namespace MvvmLight1.Model
         /// <param name="aElement"></param>
         public void AnalysisPortfolio(IHTMLElement aElement)
         {
-            CQ table = new CQ(aElement.innerHTML);
-
-            table["tr"][0].Remove();
-            CQ trList = table["tr"];
-
-            // 行全体.
-            trList.Each((IDomObject element) =>
+            using (TestDB)
             {
-                portfolio pf = new portfolio();
 
-                // 列個別.
-                CQ tr = new CQ(element.InnerHTML);
-                CQ tdList = tr["td"];
-                tdList.Each((int i, IDomObject ele) =>
+                CQ table = new CQ(aElement.innerHTML);
+
+                table["tr"][0].Remove();
+                CQ trList = table["tr"];
+
+                // 行全体.
+                trList.Each((IDomObject element) =>
                 {
-                    // 文字列の取得と整形.
-                    String str = SanitizeString(ele);
+                    portfolio pf = new portfolio();
 
-                    int? k = i;
-                    String[] strArr = null;
-                    int tmpInteger;
-                    // 格納.
-                    switch (k)
+                    // 列個別.
+                    CQ tr = new CQ(element.InnerHTML);
+                    CQ tdList = tr["td"];
+                    tdList.Each((int i, IDomObject ele) =>
                     {
-                        case 1:
-                            String codeStr = str.Substring(0, 4);
-                            if (Int32.TryParse(codeStr, out tmpInteger)) { pf.銘柄コード = tmpInteger; }
-                            String NameStr = str.Substring(4);
-                            NameStr = NameStr.Trim();
-                            pf.銘柄 = NameStr;
-                            break;
-                        case 2:
-                            strArr = str.Split(new String[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
-                            Int32 aYear, aMonth, aDay;
-                            if ((Int32.TryParse("20" + strArr[0], out aYear)) &&
-                                (Int32.TryParse(strArr[1], out aMonth)) &&
-                                (Int32.TryParse(strArr[2], out aDay)))
-                            {
-                                pf.買付日 = new DateTime(aYear, aMonth, aDay);
-                            }
-                            break;
-                        case 3:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.数量 = tmpInteger; }
-                            break;
-                        case 4:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.参考単価 = tmpInteger; }
-                            break;
-                        case 5:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.現在値 = tmpInteger; }
-                            break;
-                        case 6:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.前日比 = tmpInteger; }
-                            break;
-                        case 7:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.損益 = tmpInteger; }
-                            break;
-                        case 8:
-                            float tmpFloat;
-                            if (float.TryParse(str, out tmpFloat)) { pf.損益パーセント = tmpFloat; }
-                            break;
-                        case 9:
-                            if (Int32.TryParse(str, out tmpInteger)) { pf.評価額 = tmpInteger; }
-                            break;
-                        case 0:
-                            CQ anchorCQ = new CQ(ele.InnerHTML);
-                            CQ anchorList = anchorCQ["a"];
-                            KeyValuePair<String, String> anchor;
-                            anchor = anchorList[0].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
-                            pf.現買リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
-                            anchor = anchorList[1].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
-                            pf.現売リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
-                            break;
-                        case 10:
-                        default:
-                            break;
+                        // 文字列の取得と整形.
+                        String str = SanitizeString(ele);
+
+                        int? k = i;
+                        String[] strArr = null;
+                        int tmpInteger;
+                        // 格納.
+                        switch (k)
+                        {
+                            case 1:
+                                String codeStr = str.Substring(0, 4);
+                                if (Int32.TryParse(codeStr, out tmpInteger)) { pf.銘柄コード = tmpInteger; }
+                                String NameStr = str.Substring(4);
+                                NameStr = NameStr.Trim();
+                                pf.銘柄 = NameStr;
+                                break;
+                            case 2:
+                                strArr = str.Split(new String[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+                                Int32 aYear, aMonth, aDay;
+                                if ((Int32.TryParse("20" + strArr[0], out aYear)) &&
+                                    (Int32.TryParse(strArr[1], out aMonth)) &&
+                                    (Int32.TryParse(strArr[2], out aDay)))
+                                {
+                                    pf.買付日 = new DateTime(aYear, aMonth, aDay);
+                                }
+                                break;
+                            case 3:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.数量 = tmpInteger; }
+                                break;
+                            case 4:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.参考単価 = tmpInteger; }
+                                break;
+                            case 5:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.現在値 = tmpInteger; }
+                                break;
+                            case 6:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.前日比 = tmpInteger; }
+                                break;
+                            case 7:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.損益 = tmpInteger; }
+                                break;
+                            case 8:
+                                float tmpFloat;
+                                if (float.TryParse(str, out tmpFloat)) { pf.損益パーセント = tmpFloat; }
+                                break;
+                            case 9:
+                                if (Int32.TryParse(str, out tmpInteger)) { pf.評価額 = tmpInteger; }
+                                break;
+                            case 0:
+                                CQ anchorCQ = new CQ(ele.InnerHTML);
+                                CQ anchorList = anchorCQ["a"];
+                                KeyValuePair<String, String> anchor;
+                                anchor = anchorList[0].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
+                                pf.現買リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
+                                anchor = anchorList[1].Attributes.First((v) => Regex.IsMatch(v.Key, @"href", RegexOptions.IgnoreCase));
+                                pf.現売リンク = @"https://site2.sbisec.co.jp" + anchor.Value;
+                                break;
+                            case 10:
+                            default:
+                                break;
+                        }
+                    });
+                    pf.更新日時 = DateTime.Now;
+
+                    lock (TestDB)
+                    {
+                        // 保存.
+                        TestDB.Insert(pf);
                     }
                 });
-                pf.更新日時 = DateTime.Now;
-
-                using (TestDB)
-                {
-                    // 保存.
-                    TestDB.Insert(pf);
-                }
-            });
-
+            }
         }
 
         /// <summary>
@@ -273,8 +282,11 @@ namespace MvvmLight1.Model
 
                 using (TestDB)
                 {
-                    // 保存.
-                    TestDB.Insert(pf);
+                    lock (TestDB)
+                    {
+                        // 保存.
+                        TestDB.Insert(pf);
+                    }
                 }
             }
         }

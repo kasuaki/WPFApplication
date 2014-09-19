@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition;
 
 namespace MvvmLight1.ViewModel
 {
@@ -20,7 +21,9 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class CheckShareWBVM : CheckPortfolioWBVM, IWebBrowserVM
+    [Export(typeof(ICheckShareWBVM))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class CheckShareWBVM : ACheckWBVM, ICheckShareWBVM
     {
         protected override void LoadCompletedEvent(WebBrowser sender)
         {
@@ -30,10 +33,13 @@ namespace MvvmLight1.ViewModel
         /// <summary>
         /// Initializes a new instance of the WebBrowserVM class.
         /// </summary>
-        public CheckShareWBVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow)
-            : base(aUri, aCommonVM, aColumn, aRow, "")
+        [ImportingConstructor]
+        public CheckShareWBVM([Import("ICheckShareWBVM.aUri")] Uri aUri,
+                              [Import("ICheckShareWBVM.aCommonVM")] CommonVM aCommonVM,
+                              [Import("ICheckShareWBVM.aColumn")] Int32 aColumn,
+                              [Import("ICheckShareWBVM.aRow")] Int32 aRow)
+            : base(aUri, aCommonVM, aColumn, aRow)
         {
-            LoadCompletedCommand = new RelayCommand<WebBrowser>(LoadCompletedEvent);
             CVM.JudgeBuyShare += CVM_JudgeBuyShare;
             CVM.JudgeSellShare += CVM_JudgeSellShare;
         }
@@ -130,16 +136,6 @@ namespace MvvmLight1.ViewModel
                 {
                 }
             }
-        }
-
-        /// <summary>
-        /// Timer満了時の動作.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected override void MyDispatcherTimer_Tick(Object sender, EventArgs e)
-        {
-            PageUpdate();
         }
 
         /// <summary>

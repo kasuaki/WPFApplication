@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvvmLight1", "MvvmLight1\MvvmLight1.csproj", "{7A25A7EB-52A7-4E6C-82D2-DA2A0522DF49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuySBI", "BuySBI\BuySBI.csproj", "{715257DA-0D7F-492D-98C2-88A55C27EE4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{7A25A7EB-52A7-4E6C-82D2-DA2A0522DF49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A25A7EB-52A7-4E6C-82D2-DA2A0522DF49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A25A7EB-52A7-4E6C-82D2-DA2A0522DF49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{715257DA-0D7F-492D-98C2-88A55C27EE4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{715257DA-0D7F-492D-98C2-88A55C27EE4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{715257DA-0D7F-492D-98C2-88A55C27EE4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{715257DA-0D7F-492D-98C2-88A55C27EE4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

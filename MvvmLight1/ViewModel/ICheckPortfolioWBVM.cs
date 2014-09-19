@@ -9,19 +9,21 @@ using System.Windows.Threading;
 
 namespace MvvmLight1.ViewModel
 {
-    public interface IBuyShareVM : IDisposable
+    public interface ICheckPortfolioWBVM : IDisposable
     {
-        Panel MyPanel { get; set; }
+        DispatcherTimer MyDispatcherTimer { get; }
         Uri MyUri { get; set; }
-        WebBrowser WB { get; set; }
+        WebBrowser WB { get; }
         Status MyStatus { get; set; }
-        Int32 Code { get; set; }
 
 
 
         void WebBrowserAdd(Panel aPanel);
-        void WebBrowserRemove();
-        void BuyShare();
+        void WebBrowserRemove(Panel aPanel);
+        void TimerStart();
+        void TimerStop();
+        void WatchStart();
+        void PageUpdate();
         void Dispose();
     }
 }

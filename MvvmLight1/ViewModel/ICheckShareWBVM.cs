@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using System.Windows.Threading;
 
 namespace MvvmLight1.ViewModel
 {
-    interface IWebBrowserVM : IDisposable
+    public interface ICheckShareWBVM : IDisposable
     {
         DispatcherTimer MyDispatcherTimer { get; }
         Uri MyUri { get; set; }

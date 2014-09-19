@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace MvvmLight1.ViewModel
 {
@@ -20,14 +21,20 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class BuySellShareBaseVM : MyViewModelBase, IDisposable
+    public abstract class ACheckWBVM : MyViewModelBase
     {
-        public Panel MyPanel { get; set; }
+        public DispatcherTimer _MyDispatcherTimer;
+        public DispatcherTimer MyDispatcherTimer
+        {
+            get
+            {
+                return _MyDispatcherTimer;
+            }
+        }
         public Uri MyUri { get; set; }
         public MyWebBrowser MyGrid { get; set; }
         public WebBrowser WB { get; set; }
         public Status MyStatus { get; set; }
-        public Int32 Code { get; set; }
         public String User;
         public String Pass;
 
@@ -44,19 +51,12 @@ namespace MvvmLight1.ViewModel
                 RaisePropertyChanged("LoadCompletedCommand");
             }
         }
-        protected virtual void LoadCompletedEvent(WebBrowser sender)
-        {
-        }
-
-        public BuySellShareBaseVM()
-        {
-
-        }
+        protected abstract void LoadCompletedEvent(WebBrowser sender);
 
         /// <summary>
         /// Initializes a new instance of the WebBrowserVM class.
         /// </summary>
-        public BuySellShareBaseVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow, Int32 aCode)
+        public ACheckWBVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow)
             : base(aCommonVM)
         {
             MyGrid = new MyWebBrowser();
@@ -68,7 +68,13 @@ namespace MvvmLight1.ViewModel
             MyUri = aUri;
             WB = this.MyGrid.Children.OfType<WebBrowser>().First();
             MyStatus = Status.Watching;
-            Code = aCode;
+
+            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(30 * TimeSpan.TicksPerSecond),
+                                                     DispatcherPriority.Normal,
+                                                     MyDispatcherTimer_Tick,
+                                                     Dispatcher.CurrentDispatcher) { IsEnabled = false };
+
+            LoadCompletedCommand = new RelayCommand<WebBrowser>(LoadCompletedEvent);
 
             User = CVM.GetIniData("login.ini", "LOGIN", "USER");
             Pass = CVM.GetIniData("login.ini", "LOGIN", "PASS");
@@ -77,15 +83,46 @@ namespace MvvmLight1.ViewModel
         public void WebBrowserAdd(Panel aPanel)
         {
             aPanel.Children.Add(MyGrid);
-            MyPanel = aPanel;
         }
 
-        public void WebBrowserRemove()
+        public void WebBrowserRemove(Panel aPanel)
         {
-            MyPanel.Children.Remove(MyGrid);
+            aPanel.Children.Remove(MyGrid);
         }
-    
-        public void Dispose()
+
+        public void TimerStart()
+        {
+            MyDispatcherTimer.IsEnabled = true;
+            MyDispatcherTimer.Start();
+        }
+
+        public void TimerStop()
+        {
+            MyDispatcherTimer.Stop();
+            MyDispatcherTimer.IsEnabled = false;
+        }
+
+        /// <summary>
+        /// ページ更新処理.
+        /// </summary>
+        public abstract void PageUpdate();
+
+        /// <summary>
+        /// 監視処理.
+        /// </summary>
+        public abstract void WatchStart();
+
+        /// <summary>
+        /// Timer満了時の動作.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void MyDispatcherTimer_Tick(Object sender, EventArgs e)
+        {
+            PageUpdate();
+        }
+
+        public virtual void Dispose()
         {
             WB.Dispose();
         }

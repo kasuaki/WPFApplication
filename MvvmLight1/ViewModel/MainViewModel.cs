@@ -13,6 +13,9 @@ using System.Windows;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition.Hosting;
+using System.Reflection;
+using System.ComponentModel.Composition;
 
 namespace MvvmLight1.ViewModel
 {
@@ -22,6 +25,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
+    [Export]
     public class MainViewModel : MyViewModelBase, IDisposable
     {
         private Panel _TmpGrid;
@@ -38,10 +42,17 @@ namespace MvvmLight1.ViewModel
             }
         }
 
-        Collection<IWebBrowserVM> WBVMWatchCollection { get; set; }
-        public IBuyShareVM BuyShareVM;
-        public ISellShareVM SellShareVM;
+        [ImportMany(typeof(ICheckPortfolioWBVM))]
+        Collection<ICheckPortfolioWBVM> WBVMWatchCollection { get; set; }
+
+//        [Import(typeof(IBuyShareVM))]
+        public IBuyShareVM BuyShareVM { get; set; }
+        //[Import(typeof(ISellShareVM))]
+        public ISellShareVM SellShareVM { get; set; }
+        [Import(typeof(ICheckShareWBVM))]
+        public ICheckShareWBVM CheckShareWBVM { get; set; }
         public Collection<IWatchSpecificShareVM> WatchSpecificShareVMCollection { get; set; }
+        public Lazy<GetMEF> MyGetMEF { get; set; }
         
         /// <summary>
         /// ボタン実行処理.
@@ -50,7 +61,7 @@ namespace MvvmLight1.ViewModel
         private void ButtonClickCommandEventHandler(MainWindow window)
         {
             MainViewModel aMainVM = window.DataContext as MainViewModel;
-            IWebBrowserVM aMyWB = aMainVM.WBVMWatchCollection.First();
+            ICheckPortfolioWBVM aMyWB = aMainVM.WBVMWatchCollection.First();
 
             CVM.DB.JudgeBuy();
         }
@@ -119,6 +130,18 @@ namespace MvvmLight1.ViewModel
 //                counter *= 2;
             });
 
+            CheckShareWBVM.WebBrowserAdd(TmpGrid);
+            new System.Threading.Timer((state) =>
+            {
+                Task.Factory.StartNew((obj) =>
+                {
+                    CheckShareWBVM.TimerStart();
+                }, CVM.UI);
+
+                CVM.Dispatcher.BeginInvoke(new Action(() => { CheckShareWBVM.PageUpdate(); }));
+
+            }, null, counter, System.Threading.Timeout.Infinite);
+
             WatchSpecificShareVMCollection.ToList().ForEach((element) => {
                 element.WebBrowserAdd(TmpGrid);
 
@@ -150,9 +173,27 @@ namespace MvvmLight1.ViewModel
 
             CVM = new CommonVM(aDispatcher);
 
-            WBVMWatchCollection = new Collection<IWebBrowserVM>();
-            WBVMWatchCollection.Add(new CheckPortfolioWBVM(CVM.MyUri, CVM, 0, 1, "角川ドワンゴ"));
-            WBVMWatchCollection.Add(new CheckShareWBVM(CVM.MyUri, CVM, 0, 2));
+            WBVMWatchCollection = new Collection<ICheckPortfolioWBVM>();
+
+            // Catalogを１まとめに  
+            var aggCatalog = new AggregateCatalog();
+            aggCatalog.Catalogs.Add(new AssemblyCatalog(Assembly.GetExecutingAssembly()));
+            var container = new CompositionContainer(aggCatalog);
+
+
+            // CatalogでContainerを作成  
+            container.ComposeExportedValue("ICheckPortfolioWBVM.aUri", CVM.MyUri);
+            container.ComposeExportedValue("ICheckPortfolioWBVM.aCommonVM", CVM);
+            container.ComposeExportedValue("ICheckPortfolioWBVM.aColumn", 0);
+            container.ComposeExportedValue("ICheckPortfolioWBVM.aRow", 1);
+            container.ComposeExportedValue("ICheckPortfolioWBVM.aPortFolio", "角川ドワンゴ");
+
+            container.ComposeExportedValue("ICheckShareWBVM.aUri", CVM.MyUri);
+            container.ComposeExportedValue("ICheckShareWBVM.aCommonVM", CVM);
+            container.ComposeExportedValue("ICheckShareWBVM.aColumn", 0);
+            container.ComposeExportedValue("ICheckShareWBVM.aRow", 2);
+          
+            container.ComposeParts(this);
 
             WatchSpecificShareVMCollection = new Collection<IWatchSpecificShareVM>();
 //            WatchSpecificShareVMCollection.Add(new WatchSpecificShareVM(CVM.MyUri, CVM, 0, 3, 3715));
