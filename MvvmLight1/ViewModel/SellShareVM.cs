@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition;
 
 namespace MvvmLight1.ViewModel
 {
@@ -20,6 +21,8 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
+    [Export(typeof(ISellShareVM))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
     public class SellShareVM : BuySellShareBaseVM, ISellShareVM
     {
         protected override void LoadCompletedEvent(WebBrowser sender)
@@ -30,7 +33,12 @@ namespace MvvmLight1.ViewModel
         /// <summary>
         /// Initializes a new instance of the WebBrowserVM class.
         /// </summary>
-        public SellShareVM(Uri aUri, CommonVM aCommonVM, Int32 aColumn, Int32 aRow, Int32 aCode)
+        [ImportingConstructor]
+        public SellShareVM([Import("SellShareVM.aUri")] Uri aUri,
+                           [Import("SellShareVM.aCommonVM")] CommonVM aCommonVM,
+                           [Import("SellShareVM.aColumn")] Int32 aColumn,
+                           [Import("SellShareVM.aRow")] Int32 aRow,
+                           [Import("SellShareVM.aCode")] Int32 aCode)
             : base(aUri, aCommonVM, aColumn, aRow, aCode)
         {
             LoadCompletedCommand = new RelayCommand<WebBrowser>(LoadCompletedEvent);

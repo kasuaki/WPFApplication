@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel.Composition;
 
 namespace MvvmLight1.ViewModel
 {
@@ -20,7 +21,7 @@ namespace MvvmLight1.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class BuySellShareBaseVM : MyViewModelBase, IDisposable
+    public class BuySellShareBaseVM : MyViewModelBase, IDisposable, IPartImportsSatisfiedNotification
     {
         public Panel MyPanel { get; set; }
         public Uri MyUri { get; set; }
@@ -46,6 +47,11 @@ namespace MvvmLight1.ViewModel
         }
         protected virtual void LoadCompletedEvent(WebBrowser sender)
         {
+        }
+
+        public void OnImportsSatisfied()
+        {
+
         }
 
         public BuySellShareBaseVM()

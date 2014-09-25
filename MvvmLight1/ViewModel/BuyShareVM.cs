@@ -80,16 +80,24 @@ namespace MvvmLight1.ViewModel
             // ポートフォリオ画面(想定).
             else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"注文入力（現物買）")) != 0)
             {
+                // 株数インクリメント.
                 var image = imageList.First((e) => Regex.IsMatch(e.getAttribute("src"), @"b_plus.gif"));
                 var plusButton = image.parentElement;
                 plusButton.click();
 
+                // 成行に変更.
                 var nariButton = inputList.First(e => "in_sasinari_kbn".Equals(e.getAttribute("name")) && "N".Equals(e.getAttribute("value")));
                 nariButton.click();
 
+                // 特定預かりに変更.
+                var tokuteiButton = inputList.First(e => "hitokutei_trade_kbn".Equals(e.getAttribute("name")) && "0".Equals(e.getAttribute("value")));
+                tokuteiButton.click();
+
+                // パスワード入力.
                 var pass = inputList.First(e => "trade_pwd".Equals(e.getAttribute("name")));
                 pass.setAttribute("value", Pass);
 
+                // 注文確認画面を省略.
                 HTMLInputElement checkbox = (HTMLInputElement)(inputList.First(e => "skip_estimate".Equals(e.getAttribute("name"))));
                 checkbox.@checked = true;
 

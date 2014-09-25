@@ -302,12 +302,16 @@ namespace MvvmLight1.Model
 
             using (TestDB)
             {
+                List<int?> shareList = TestDB.shares.OrderBy(p => p.銘柄コード).Select(p => p.銘柄コード).Distinct().ToList();
+
                 // ユニークな銘柄コレクションを取得.
-                List<int?> codeList = TestDB.portfolios.OrderBy(p => p.銘柄コード).Select(p => p.銘柄コード).Distinct().ToList();
+                List<int?> codeList = TestDB.portfolios
+                    .Where(p => shareList.Contains(p.銘柄コード) == false)    // 既に購入している株は対象にしない.
+                    .OrderBy(p => p.銘柄コード).Select(p => p.銘柄コード).Distinct().ToList();
 
                 foreach(int? tmpcode in codeList)
                 {
-                    code = (Int32)tmpcode;
+                    code = tmpcode ?? 0;
 
                     IEnumerable<portfolio> latest = TestDB.portfolios.Where(p => tmpcode.Equals(p.銘柄コード))
                                                   .OrderByDescending((portfolio p) => p.更新日時)
@@ -366,19 +370,11 @@ namespace MvvmLight1.Model
 
             using (TestDB)
             {
-                // ユニークな銘柄コレクションを取得.
+                // ユニークな持株コレクションを取得.
                 List<int?> shareList = TestDB.shares.OrderBy(p => p.銘柄コード).Select(p => p.銘柄コード).Distinct().ToList();
 
-                // ユニークな銘柄コレクションを取得.
-                List<int?> codeList = TestDB.portfolios.OrderBy(p => p.銘柄コード).Select(p => p.銘柄コード).Distinct().ToList();
-
-                foreach (int? tmpcode in codeList)
+                foreach (int? tmpcode in shareList)
                 {
-                    if (!(shareList.Contains(tmpcode)))
-                    {
-                        continue;
-                    }
-
                     code = (Int32)tmpcode;
                     IEnumerable<portfolio> latest = TestDB.portfolios.Where(p => tmpcode.Equals(p.銘柄コード))
                                                   .OrderByDescending((portfolio p) => p.更新日時)
@@ -454,7 +450,10 @@ namespace MvvmLight1.Model
 
         public void Dispose()
         {
-            _TestDB.Dispose();
+            if (_TestDB != null)
+            {
+                _TestDB.Dispose();
+            }
         }    
     }
 }

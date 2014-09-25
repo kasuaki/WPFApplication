@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.ComponentModel.Composition.Hosting;
 
 namespace MvvmLight1.ViewModel
 {
@@ -16,6 +17,17 @@ namespace MvvmLight1.ViewModel
         NowBuying,
         NowSelling,
     }
+
+    public class BuySellEventArgs : EventArgs
+    {
+        public Int32 Code;
+
+        public BuySellEventArgs(Int32 aCode)
+        {
+            Code = aCode;
+        }
+    }
+
     /// <summary>
     /// This class contains properties that a View can data bind to.
     /// <para>
@@ -29,6 +41,7 @@ namespace MvvmLight1.ViewModel
         public TaskScheduler UI { get; set; }
         public TestDBWrap DB { get; set; }
         public Dispatcher Dispatcher { get; set; }
+        public AggregateCatalog AggregateCatalog { get; set; }
 
         // 買い判断イベント.
         public event EventHandler<EventArgs> JudgeBuyShare;
@@ -147,16 +160,6 @@ namespace MvvmLight1.ViewModel
             DB = null;
             UI = null;
             Dispatcher = null;
-        }
-    }
-
-    public class BuySellEventArgs : EventArgs
-    {
-        public Int32 Code;
-
-        public BuySellEventArgs(Int32 aCode)
-        {
-            Code = aCode;
         }
     }
 }

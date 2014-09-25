@@ -16,9 +16,24 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
 using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Primitives;
 
 namespace MvvmLight1.ViewModel
 {
+    [Export]
+    public class BuyShareVMFactory
+    {
+        [Import(typeof(IBuyShareVM))]
+        public IBuyShareVM BuyShareVM { get; set; }
+    }
+
+    [Export]
+    public class SellShareVMFactory
+    {
+        [Import(typeof(ISellShareVM))]
+        public ISellShareVM SellShareVM { get; set; }
+    }
+
     /// <summary>
     /// This class contains properties that the main View can data bind to.
     /// <para>
@@ -176,10 +191,10 @@ namespace MvvmLight1.ViewModel
             WBVMWatchCollection = new Collection<ICheckPortfolioWBVM>();
 
             // Catalogを１まとめに  
-            var aggCatalog = new AggregateCatalog();
-            aggCatalog.Catalogs.Add(new AssemblyCatalog(Assembly.GetExecutingAssembly()));
-            var container = new CompositionContainer(aggCatalog);
+            CVM.AggregateCatalog = new AggregateCatalog();
+            CVM.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(Assembly.GetExecutingAssembly()));
 
+            var container = new CompositionContainer(CVM.AggregateCatalog);
 
             // CatalogでContainerを作成  
             container.ComposeExportedValue("ICheckPortfolioWBVM.aUri", CVM.MyUri);
@@ -211,8 +226,7 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         void CVM_SellShareEnd(object sender, BuySellEventArgs e)
         {
-            CheckShareWBVM aCheckShareWBVM = WBVMWatchCollection.OfType<CheckShareWBVM>().First();
-            aCheckShareWBVM.MyStatus = Status.Watching;
+            this.CheckShareWBVM.MyStatus = Status.Watching;
 
             SellShareVM.WebBrowserRemove();
             SellShareVM.Dispose();
@@ -226,8 +240,7 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         private void CVM_BuyShareEnd(object sender, BuySellEventArgs e)
         {
-            CheckShareWBVM aCheckShareWBVM = WBVMWatchCollection.OfType<CheckShareWBVM>().First();
-            aCheckShareWBVM.MyStatus = Status.HaveShares;
+            this.CheckShareWBVM.MyStatus = Status.HaveShares;
 
             BuyShareVM.WebBrowserRemove();
             BuyShareVM.Dispose();
@@ -241,14 +254,26 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         private void CVM_BuyShare(object sender, BuySellEventArgs e)
         {
-            BuyShareVM = new BuyShareVM(CVM.MyUri, CVM, 0, 3, e.Code);
+            // CatalogでContainerを作成  
+            BuyShareVMFactory aBuyShareVMFactory = new BuyShareVMFactory();
+            var container = new CompositionContainer(CVM.AggregateCatalog);
+
+            container.ComposeExportedValue("BuyShareVM.aUri", CVM.MyUri);
+            container.ComposeExportedValue("BuyShareVM.aCommonVM", CVM);
+            container.ComposeExportedValue("BuyShareVM.aColumn", 0);
+            container.ComposeExportedValue("BuyShareVM.aRow", 3);
+            container.ComposeExportedValue("BuyShareVM.aCode", e.Code);
+
+            container.ComposeParts(aBuyShareVMFactory);
+
+            BuyShareVM = aBuyShareVMFactory.BuyShareVM;
             BuyShareVM.WebBrowserAdd(TmpGrid);
 
             System.Threading.Timer timer = new System.Threading.Timer((state) =>
             {
                 CVM.Dispatcher.BeginInvoke(new Action(() => { BuyShareVM.WB.Navigate(CVM.MyUri); }));
 
-            }, null, 3000, System.Threading.Timeout.Infinite);
+            }, null, 500, System.Threading.Timeout.Infinite);
         }
 
         /// <summary>
@@ -258,14 +283,26 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         private void CVM_SellShare(object sender, BuySellEventArgs e)
         {
-            SellShareVM = new SellShareVM(CVM.MyUri, CVM, 0, 3, e.Code);
+            // CatalogでContainerを作成  
+            SellShareVMFactory aSellShareVMFactory = new SellShareVMFactory();
+            var container = new CompositionContainer(CVM.AggregateCatalog);
+
+            container.ComposeExportedValue("SellShareVM.aUri", CVM.MyUri);
+            container.ComposeExportedValue("SellShareVM.aCommonVM", CVM);
+            container.ComposeExportedValue("SellShareVM.aColumn", 0);
+            container.ComposeExportedValue("SellShareVM.aRow", 3);
+            container.ComposeExportedValue("SellShareVM.aCode", e.Code);
+
+            container.ComposeParts(aSellShareVMFactory);
+
+            SellShareVM = aSellShareVMFactory.SellShareVM;
             SellShareVM.WebBrowserAdd(TmpGrid);
 
             System.Threading.Timer timer = new System.Threading.Timer((state) =>
             {
                 CVM.Dispatcher.BeginInvoke(new Action(() => { SellShareVM.WB.Navigate(CVM.MyUri); }));
 
-            }, null, 3000, System.Threading.Timeout.Infinite);
+            }, null, 500, System.Threading.Timeout.Infinite);
         }
 
         public void Dispose()

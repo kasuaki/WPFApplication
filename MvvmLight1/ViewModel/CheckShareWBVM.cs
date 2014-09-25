@@ -151,6 +151,7 @@ namespace MvvmLight1.ViewModel
             // 購入依頼.
             if (result.Item1)
             {
+                MyStatus = Status.NowBuying;
                 CVM.OnBuyShare(new BuySellEventArgs(result.Item2));
             }
         }
@@ -168,6 +169,7 @@ namespace MvvmLight1.ViewModel
             // 売却依頼.
             if (result.Item1)
             {
+                MyStatus = Status.NowSelling;
                 CVM.OnSellShare(new BuySellEventArgs(result.Item2));
             }
         }
