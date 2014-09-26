@@ -77,6 +77,14 @@ namespace MvvmLight1.ViewModel
                 String str = CVM.DB.TestDB.portfolios.Where((e) => Code.Equals(e.銘柄コード)).OrderByDescending(e => e.更新日時).Select(e => e.現買リンク).First();
                 WB.Navigate(str);
             }
+            else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"受付できません")) != 0)
+            {
+                CVM.OnBuyShareEnd(new BuySellEventArgs(Code, false));
+            }
+            else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"ご注文を受け付けました。")) != 0)
+            {
+                CVM.OnBuyShareEnd(new BuySellEventArgs(Code, true));
+            }
             // ポートフォリオ画面(想定).
             else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"注文入力（現物買）")) != 0)
             {
@@ -103,9 +111,7 @@ namespace MvvmLight1.ViewModel
 
                 var submitButton = inputList.First(e => @"注文発注".Equals(e.getAttribute("value")));
                 // TODO:注文コメントアウトしている.
-                //submitButton.click();
-
-                CVM.OnBuyShareEnd(new BuySellEventArgs(Code));
+                submitButton.click();
             }
         }
     }

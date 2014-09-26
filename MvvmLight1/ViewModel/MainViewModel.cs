@@ -226,7 +226,14 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         void CVM_SellShareEnd(object sender, BuySellEventArgs e)
         {
-            this.CheckShareWBVM.MyStatus = Status.Watching;
+            if (e.IsSuccess)
+            {
+                this.CheckShareWBVM.MyStatus = Status.Watching;
+            }
+            else
+            {
+                throw new Exception("株売失敗:" + e.Code);
+            }
 
             SellShareVM.WebBrowserRemove();
             SellShareVM.Dispose();
@@ -240,7 +247,14 @@ namespace MvvmLight1.ViewModel
         /// <param name="e"></param>
         private void CVM_BuyShareEnd(object sender, BuySellEventArgs e)
         {
-            this.CheckShareWBVM.MyStatus = Status.HaveShares;
+            if (e.IsSuccess)
+            {
+                this.CheckShareWBVM.MyStatus = Status.HaveShares;
+            }
+            else
+            {
+                throw new Exception("株買失敗:" + e.Code);
+            }
 
             BuyShareVM.WebBrowserRemove();
             BuyShareVM.Dispose();
@@ -261,7 +275,7 @@ namespace MvvmLight1.ViewModel
             container.ComposeExportedValue("BuyShareVM.aUri", CVM.MyUri);
             container.ComposeExportedValue("BuyShareVM.aCommonVM", CVM);
             container.ComposeExportedValue("BuyShareVM.aColumn", 0);
-            container.ComposeExportedValue("BuyShareVM.aRow", 3);
+            container.ComposeExportedValue("BuyShareVM.aRow", 0);
             container.ComposeExportedValue("BuyShareVM.aCode", e.Code);
 
             container.ComposeParts(aBuyShareVMFactory);

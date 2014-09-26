@@ -152,7 +152,7 @@ namespace MvvmLight1.ViewModel
             if (result.Item1)
             {
                 MyStatus = Status.NowBuying;
-                CVM.OnBuyShare(new BuySellEventArgs(result.Item2));
+                CVM.OnBuyShare(new BuySellEventArgs(result.Item2, false));
             }
         }
 
@@ -170,7 +170,7 @@ namespace MvvmLight1.ViewModel
             if (result.Item1)
             {
                 MyStatus = Status.NowSelling;
-                CVM.OnSellShare(new BuySellEventArgs(result.Item2));
+                CVM.OnSellShare(new BuySellEventArgs(result.Item2, false));
             }
         }
 

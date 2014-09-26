@@ -59,12 +59,19 @@ namespace MvvmLight1.ViewModel
                 // ポートフォリオ画面(想定).
                 if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"ポートフォリオ名")) != 0)
                 {
-                    var inputList = aHTMLDocument.getElementsByTagName("input").Cast<IHTMLElement>();
-                    IHTMLElement button = inputList.First(element => (("button".Equals(element.getAttribute("type"))) &&
-                                                                      ("情報更新".Equals(element.getAttribute("value")))
-                                                                     )
-                    );
-                    button.click();
+                    try
+                    {
+                        var inputList = aHTMLDocument.getElementsByTagName("input").Cast<IHTMLElement>();
+                        IHTMLElement button = inputList.First(element => (("button".Equals(element.getAttribute("type"))) &&
+                                                                          ("情報更新".Equals(element.getAttribute("value")))
+                                                                         )
+                        );
+                        button.click();
+                    }
+                    catch(Exception e)
+                    {
+                        WatchStart();
+                    }
                 }
                 else
                 {
@@ -141,14 +148,19 @@ namespace MvvmLight1.ViewModel
                 }
                 else
                 {
+                    try
+                    {
+                        // テーブル取得.
+                        var tdList = aHTMLDocument.getElementsByTagName("td").Cast<IHTMLElement>();
+                        IHTMLElement tanka = tdList.First(element => ((element.innerText != null) && (element.innerText.Equals(@"参考単価"))));
+                        IHTMLElement table = tanka.parentElement.parentElement.parentElement;
 
-                    // テーブル取得.
-                    var tdList = aHTMLDocument.getElementsByTagName("td").Cast<IHTMLElement>();
-                    IHTMLElement tanka = tdList.First(element => ((element.innerText != null) && (element.innerText.Equals(@"参考単価"))));
-                    IHTMLElement table = tanka.parentElement.parentElement.parentElement;
-
-                    // 解析.
-                    CVM.DB.AnalysisPortfolio(table);
+                        // 解析.
+                        CVM.DB.AnalysisPortfolio(table);
+                    }
+                    catch(Exception e)
+                    {
+                    }
                 }
             }
         }

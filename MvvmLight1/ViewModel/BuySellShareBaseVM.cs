@@ -70,6 +70,7 @@ namespace MvvmLight1.ViewModel
             Grid.SetRow(MyGrid, aRow);
             Grid.SetColumn(MyGrid, aColumn);
             Grid.SetColumnSpan(MyGrid, 3);
+            Grid.SetRowSpan(MyGrid, 4);
 
             MyUri = aUri;
             WB = this.MyGrid.Children.OfType<WebBrowser>().First();

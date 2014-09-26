@@ -21,10 +21,12 @@ namespace MvvmLight1.ViewModel
     public class BuySellEventArgs : EventArgs
     {
         public Int32 Code;
+        public Boolean IsSuccess;
 
-        public BuySellEventArgs(Int32 aCode)
+        public BuySellEventArgs(Int32 aCode, Boolean aIsSuccess)
         {
             Code = aCode;
+            IsSuccess = aIsSuccess;
         }
     }
 

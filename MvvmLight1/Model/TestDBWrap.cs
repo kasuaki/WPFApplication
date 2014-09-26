@@ -130,20 +130,21 @@ namespace MvvmLight1.Model
                     String str = SanitizeString(ele);
 
                     int? k = i;
+                    int tmpInteger;
                     // 格納.
                     switch (k)
                     {
                         case 0:
-                            share.保有株数 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { share.保有株数 = tmpInteger; }
                             break;
                         case 1:
-                            share.取得単価 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { share.取得単価 = tmpInteger; }
                             break;
                         case 2:
-                            share.現在値 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { share.現在値 = tmpInteger; }
                             break;
                         case 3:
-                            share.評価損益 = Int32.Parse(str);
+                            if (Int32.TryParse(str, out tmpInteger)) { share.評価損益 = tmpInteger; }
                             break;
                         default:
                             break;
@@ -298,7 +299,7 @@ namespace MvvmLight1.Model
         {
             Boolean aCanBuySell = false;
             Int32 code = 0;
-            Int32 checkCount = 6;   // 何回前までさかのぼってチェックするか.
+            Int32 checkCount = 3;   // 何回前までさかのぼってチェックするか.
 
             using (TestDB)
             {
@@ -321,7 +322,7 @@ namespace MvvmLight1.Model
                     Int32 first現在値 = latest.First().現在値 ?? 0;
                     Int32 last現在値 = latest.Last().現在値 ?? 0;
                     Int32 差分 = last現在値 - first現在値;
-                    if (差分 >= 5)
+                    //if (差分 >= 5)
                     {
                         portfolio beforeP = null;
                         foreach (portfolio p in latest)
