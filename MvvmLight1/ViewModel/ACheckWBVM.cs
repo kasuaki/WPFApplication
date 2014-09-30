@@ -69,7 +69,7 @@ namespace MvvmLight1.ViewModel
             WB = this.MyGrid.Children.OfType<WebBrowser>().First();
             MyStatus = Status.Watching;
 
-            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(60 * TimeSpan.TicksPerSecond),
+            _MyDispatcherTimer = new DispatcherTimer(new TimeSpan(30 * TimeSpan.TicksPerSecond),
                                                      DispatcherPriority.Normal,
                                                      MyDispatcherTimer_Tick,
                                                      Dispatcher.CurrentDispatcher) { IsEnabled = false };

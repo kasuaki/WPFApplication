@@ -232,7 +232,7 @@ namespace MvvmLight1.ViewModel
             }
             else
             {
-                throw new Exception("株売失敗:" + e.Code);
+                System.Windows.MessageBox.Show("株売失敗:" + e.Code);
             }
 
             SellShareVM.WebBrowserRemove();
@@ -253,7 +253,7 @@ namespace MvvmLight1.ViewModel
             }
             else
             {
-                throw new Exception("株買失敗:" + e.Code);
+                System.Windows.MessageBox.Show("株買失敗:" + e.Code);
             }
 
             BuyShareVM.WebBrowserRemove();

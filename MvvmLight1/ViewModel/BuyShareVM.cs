@@ -77,7 +77,8 @@ namespace MvvmLight1.ViewModel
                 String str = CVM.DB.TestDB.portfolios.Where((e) => Code.Equals(e.銘柄コード)).OrderByDescending(e => e.更新日時).Select(e => e.現買リンク).First();
                 WB.Navigate(str);
             }
-            else if (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"受付できません")) != 0)
+            else if ((bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"受付できません")) != 0) ||
+                     (bList.Where(element => element.innerText != null).Count(element => Regex.IsMatch(element.innerText, @"買付余力が不足しております")) != 0))
             {
                 CVM.OnBuyShareEnd(new BuySellEventArgs(Code, false));
             }

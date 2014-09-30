@@ -36,6 +36,13 @@ namespace MvvmLight1.Model
 
         public TestDBWrap()
         {
+            using (TestDB)
+            {
+                lock (TestDB)
+                {
+                    TestDB.portfolios.Delete();
+                }
+            }
             //string conn = ConfigurationManager.ConnectionStrings["TestDB"].ConnectionString;
             //mNpgsqlConnection = new NpgsqlConnection(conn);
             //mNpgsqlConnection.Open();
@@ -299,7 +306,7 @@ namespace MvvmLight1.Model
         {
             Boolean aCanBuySell = false;
             Int32 code = 0;
-            Int32 checkCount = 3;   // 何回前までさかのぼってチェックするか.
+            Int32 checkCount = 6;   // 何回前までさかのぼってチェックするか.
 
             using (TestDB)
             {
@@ -322,7 +329,7 @@ namespace MvvmLight1.Model
                     Int32 first現在値 = latest.First().現在値 ?? 0;
                     Int32 last現在値 = latest.Last().現在値 ?? 0;
                     Int32 差分 = last現在値 - first現在値;
-                    //if (差分 >= 5)
+                    if (差分 > 0)
                     {
                         portfolio beforeP = null;
                         foreach (portfolio p in latest)
@@ -333,7 +340,7 @@ namespace MvvmLight1.Model
                                 continue;
                             }
 
-                            if (beforeP.現在値 < p.現在値)
+                            if (beforeP.現在値 <= p.現在値)
                             {
                                 aCanBuySell = true;
                             }
